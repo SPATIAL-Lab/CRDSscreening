@@ -8,46 +8,53 @@ sirms = read.csv("out/sirms.csv")
 ## Combine plant and soil for model fitting
 pirms = pirms[, names(pirms) != "Species"]
 names(sirms) = names(pirms)
-ad = rbind(pirms, sirms)
+airms = rbind(pirms, sirms)
 
 # Optimize model ----
 ## Tolerance for 'good' samples
-ad$Good = ad$d18O - ad$d18O.irms < 1.3 & ad$d18O - ad$d18O.irms > -1.3
+airms$Good = airms$d18O - airms$d18O.irms < 1.3 & airms$d18O - airms$d18O.irms > -1.3
 
 ## LDA cross validation
 ld.cv = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4, 
-            data = ad, CV = TRUE, prior = c(0.6, 0.4))
+            data = airms, CV = TRUE, prior = c(0.6, 0.4))
 ld.cv$class = as.logical(ld.cv$class)
 
 ## Review classifications
-plot(ad$d18O.irms, ad$d18O, pch = 1, cex = 0.75)
-points(ad$d18O.irms[ad$Good], ad$d18O[ad$Good], pch = 21, bg = "white", 
+plot(airms$d18O.irms, airms$d18O, pch = 1, cex = 0.75)
+points(airms$d18O.irms[airms$Good], airms$d18O[airms$Good], pch = 21, bg = "white", 
        cex = 1.5)
-points(ad$d18O.irms[ld.cv$class], ad$d18O[ld.cv$class], 
+points(airms$d18O.irms[ld.cv$class], airms$d18O[ld.cv$class], 
        pch = 21, bg = "blue")
 
 # Test model ----
-s1 = s2 = numeric()
-
-for(i in 1:100){
-  ind = sample(1:nrow(ad), 50)
-  tr = ad[ind,]
-  ts = ad[-ind,]
-  ld = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4,
-           data = tr, prior = c(0.6, 0.4))
-  g = as.logical(predict(ld, ts)$class)
-  
-  s1 = c(s1, sd(ts$d18O - ts$d18O.irms))
-  s2 = c(s2, sd(ts$d18O[g] - ts$d18O.irms[g])) 
+test = function(ntest, niter){
+  s.raw = s.scr = numeric()
+  right = numeric()
+  for(i in 1:niter){
+    ind = sample(1:nrow(airms), ntest)
+    tr = airms[-ind,]
+    ts = airms[ind,]
+    ld = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4,
+             data = tr, prior = c(0.6, 0.4))
+    g = as.logical(predict(ld, ts)$class)
+    
+    s.raw = c(s.raw, sd(ts$d18O - ts$d18O.irms))
+    s.scr = c(s.scr, sd(ts$d18O[g] - ts$d18O.irms[g])) 
+    right = c(right, sum(g == ts$Good) / ntest)
+  }
+  return(list(s.raw = s.raw, s.scr = s.scr, right = right))
 }
 
-mean(s1)
-mean(s2)
+t10 = test(7, 1000)
+t20 = test(15, 1000)
+
+lapply(t10, mean, na.rm = TRUE)
+lapply(t20, mean, na.rm = TRUE)
 
 # Full model ----
 ## Fit model
 ld = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4, 
-         data = ad, prior = c(0.6, 0.4))
+         data = airms, prior = c(0.6, 0.4))
 ld
 
 ## Apply screening
@@ -61,4 +68,5 @@ sirms$Good = as.logical(predict(ld, sirms)$class)
 ## Save
 write.csv(pirms, "out/pirms.csv", row.names = FALSE)
 write.csv(sirms, "out/sirms.csv", row.names = FALSE)
-save(ld, ad, file = "out/ld.rda")
+write.csv(airms, "out/airms.csv", row.names = FALSE)
+save(ld, airms, file = "out/ld.rda")
