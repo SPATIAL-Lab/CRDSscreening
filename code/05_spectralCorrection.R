@@ -1,4 +1,3 @@
-
 library(MASS)
 
 ## Read data

@@ -10,11 +10,11 @@ names(sirms) = names(pirms)
 ad = rbind(pirms, sirms)
 
 ## Tolerance for 'good' samples
-ad$Good = ad$p.diff.o < 3 & ad$p.diff.o > -1
+ad$Good = ad$d18O - ad$d18O.irms < 1.3 & ad$d18O - ad$d18O.irms > -1
 
 ## LDA cross validation
 ld.cv = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4, 
-            data = ad, CV = TRUE)
+            data = ad, CV = TRUE, prior = c(0.6, 0.4))
 ld.cv$class = as.logical(ld.cv$class)
 
 ## Review classifications
@@ -24,11 +24,9 @@ points(ad$d18O.irms[ad$Good], ad$d18O[ad$Good], pch = 21, bg = "white",
 points(ad$d18O.irms[ld.cv$class], ad$d18O[ld.cv$class], 
        pch = 21, bg = "blue")
 
-plot(density(ad$p.diff.o[ld.cv$class]))
-
 ## Fit full model
 ld = lda(Good ~ BaseShift + SlopeShift + Residuals + BaseCurve + CH4, 
-         data = ad)
+         data = ad, prior = c(0.6, 0.4))
 ld
 
 ## Apply screening
@@ -42,4 +40,4 @@ sirms$Good = as.logical(predict(ld, sirms)$class)
 ## Save
 write.csv(pirms, "out/pirms.csv", row.names = FALSE)
 write.csv(sirms, "out/sirms.csv", row.names = FALSE)
-save(ld, file = "out/ld.rda")
+save(ld, ad, file = "out/ld.rda")

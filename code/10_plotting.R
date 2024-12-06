@@ -3,6 +3,7 @@ p = read.csv("out/plants.csv")
 s = read.csv("out/soils.csv")
 pirms = read.csv("out/pirms.csv")
 sirms = read.csv("out/sirms.csv")
+load("out/ld.rda")
 
 # Figure 1 ----
 png("out/Figure1.png", 9.2, 5, units = "in", res = 600)
@@ -150,3 +151,5 @@ text(bds[2] - 0.05 * diff(bds[1:2]),
 text(bds[1] + 0.05 * diff(bds[1:2]), bds[4] - 0.05 * diff(bds[3:4]), "D")
 
 dev.off()
+
+predict(ld)
