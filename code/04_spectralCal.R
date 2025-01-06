@@ -26,6 +26,14 @@ points(airms$d18O.irms[airms$Good], airms$d18O[airms$Good], pch = 21, bg = "whit
 points(airms$d18O.irms[ld.cv$class], airms$d18O[ld.cv$class], 
        pch = 21, bg = "blue")
 
+## Compare accuracy for two instruments
+right = ld.cv$class == airms$Good
+sum(right) / length(right)
+sum(right[airms$Instrument == "HIDS2046"]) / 
+  length(right[airms$Instrument == "HIDS2046"])
+sum(right[airms$Instrument == "HIDS2052"]) / 
+  length(right[airms$Instrument == "HIDS2052"])
+
 # Test model ----
 test = function(ntest, niter){
   s.raw = s.scr = numeric()
@@ -64,6 +72,12 @@ sirms$Good = as.logical(predict(ld, sirms)$class)
 ## Fraction of data affected
 1 - sum(pirms$Good) / nrow(pirms)
 1 - sum(sirms$Good) / nrow(sirms)
+
+## By instrument
+1 - sum(pirms$Good[pirms$Instrument == "HIDS2046"]) / 
+  nrow(pirms[pirms$Instrument == "HIDS2046",])
+1 - sum(pirms$Good[pirms$Instrument == "HIDS2052"]) / 
+  nrow(pirms[pirms$Instrument == "HIDS2052",])
 
 ## Save
 write.csv(pirms, "out/pirms.csv", row.names = FALSE)

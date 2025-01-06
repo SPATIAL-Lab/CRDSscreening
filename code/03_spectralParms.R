@@ -7,7 +7,7 @@ cf = file.path("data", "cf", fn)
 sshift = data.frame("Vial" = numeric(), "BaseShift" = numeric(), 
                     "SlopeShift" = numeric(), "Residuals" = numeric(),
                     "BaseCurve" = numeric(), "CH4" = numeric(),
-                    "ID" = character())
+                    "ID" = character(), "Instrument" = character())
 for(i in seq_along(rf)){
   ## Read files
   ids = read.csv(rf[i])
@@ -44,6 +44,9 @@ for(i in seq_along(rf)){
     ids$ID = paste(ids$Identifier.2, ids$Description, sep = "_")
     spec$ID = ids$ID[match(spec$Vial, ids$Vial)]
     
+    ## Add instrument
+    spec$Instrument = rep(substr(rf[i], nchar(rf[i]) - 11, nchar(rf[i]) - 4))
+    
     ## Bind
     sshift = rbind(sshift, spec)
   }
@@ -53,11 +56,16 @@ for(i in seq_along(rf)){
 ## Average per ID
 ssAve = data.frame("ID" = unique(sshift$ID), "BaseShift" = rep(0), 
                    "SlopeShift" = rep(0), "Residuals" = rep(0),
-                   "BaseCurve" = rep(0), "CH4" = rep(0))
+                   "BaseCurve" = rep(0), "CH4" = rep(0), "Instrument" = rep(""))
 for(i in seq_along(ssAve$ID)){
+  ssSub = sshift[sshift$ID == ssAve$ID[i], ]
   for(j in 2:6){
-    ssAve[i, j] = mean(sshift[sshift$ID == ssAve$ID[i], j],
-                               na.rm = TRUE)
+    ssAve[i, j] = mean(ssSub[, j], na.rm = TRUE)
+  }
+  if(length(unique(ssSub$Instrument)) == 1){
+    ssAve[i, 7] = ssSub$Instrument[1]
+  } else{
+    ssAve[i, 7] = "Both"
   }
 }
 

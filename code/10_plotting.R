@@ -137,6 +137,8 @@ plot(d.g, xlim = range(c(d.g$x, d.b$x)), ylim = range(c(d.g$y, d.b$y)),
 lines(d.b, lwd = 3, col = bad)
 bds = par("usr")
 text(bds[1] + 0.04 * diff(bds[1:2]), bds[4] - 0.1 * diff(bds[3:4]), "A")
+lines(c(0, 1 / ld$scaling["BaseShift",]), rep(bds[3], 2), lwd = 8, 
+      lend = 1, xpd = NA)
 
 ## Slope shift
 d.g = density(a.g$SlopeShift)
@@ -148,6 +150,8 @@ plot(d.g, xlim = range(c(d.g$x, d.b$x)), ylim = range(c(d.g$y, d.b$y)),
 lines(d.b, lwd = 3, col = bad)
 bds = par("usr")
 text(bds[1] + 0.04 * diff(bds[1:2]), bds[4] - 0.1 * diff(bds[3:4]), "B")
+lines(c(0, 1 / ld$scaling["SlopeShift",]), rep(bds[3], 2), lwd = 8, 
+      lend = 1, xpd = NA)
 
 ## Residuals
 d.g = density(a.g$Residuals)
@@ -161,6 +165,8 @@ bds = par("usr")
 text(bds[1] + 0.04 * diff(bds[1:2]), bds[4] - 0.1 * diff(bds[3:4]), "C")
 legend("topright", legend = c("Good", "Bad"), col = c(good, bad), lwd = 3,
        bty = "n")
+lines(c(0, 1 / ld$scaling["Residuals",]), rep(bds[3], 2), lwd = 8, 
+      lend = 1, xpd = NA)
 
 ## Baseline curvature
 d.g = density(a.g$BaseCurve)
@@ -172,6 +178,8 @@ plot(d.g, xlim = range(c(d.g$x, d.b$x)), ylim = range(c(d.g$y, d.b$y)),
 lines(d.b, lwd = 3, col = bad)
 bds = par("usr")
 text(bds[1] + 0.04 * diff(bds[1:2]), bds[4] - 0.1 * diff(bds[3:4]), "D")
+lines(c(0, 1 / ld$scaling["BaseCurve",]), rep(bds[3], 2), lwd = 8, 
+      lend = 1, xpd = NA)
 
 ## CH4
 d.g = density(a.g$CH4)
@@ -183,11 +191,39 @@ plot(d.g, xlim = range(c(d.g$x, d.b$x)), ylim = range(c(d.g$y, d.b$y)),
 lines(d.b, lwd = 3, col = bad)
 bds = par("usr")
 text(bds[1] + 0.04 * diff(bds[1:2]), bds[4] - 0.1 * diff(bds[3:4]), "E")
+lines(c(0, 1 / ld$scaling["CH4",]), rep(bds[3], 2), lwd = 8, 
+      lend = 1, xpd = NA)
 
 dev.off()
 
 # Figure 3 ----
 png("out/Figure3.png", 9.2, 5, units = "in", res = 600)
+layout(matrix(1:2, nrow = 1))
+cols = c(good, bad)
+par(mar = c(5, 5, 1, 1))
+
+plot(SlopeShift ~ BaseShift, airms, pch = 21, cex = 1.75, lwd = 2,
+     bg = cols[match(airms$Good, c(TRUE, FALSE))],
+     xlab = expression(Delta*" Baseline shift"),
+     ylab = expression(Delta*" Slope shift"))
+bds = par("usr")
+text(bds[2] - 0.05 * diff(bds[1:2]),
+     bds[4] - 0.05 * diff(bds[3:4]), "A")
+legend("bottomleft", legend = c("Good", "Bad"), pch = 21,
+       pt.bg = cols, bty = "n", pt.cex = 1.75, pt.lwd = 2)
+
+plot(CH4 ~ BaseShift, airms, pch = 21, cex = 1.75, lwd = 2,
+     bg = cols[match(airms$Good, c(TRUE, FALSE))],
+     xlab = expression(Delta*" Baseline shift"),
+     ylab = expression(Delta*" Methane"))
+bds = par("usr")
+text(bds[2] - 0.05 * diff(bds[1:2]),
+     bds[4] - 0.05 * diff(bds[3:4]), "B")
+
+dev.off()
+
+# Figure 4 ----
+png("out/Figure4.png", 9.2, 5, units = "in", res = 600)
 layout(matrix(1:2, nrow = 1), widths = c(lcm(5 * 2.54), lcm(4.2 * 2.54)))
 
 ## All, unscreened
@@ -225,4 +261,5 @@ points(p$d18O.oc, p$d2H, pch = 21, bg = plant)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "B")
+
 dev.off()

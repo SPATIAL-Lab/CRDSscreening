@@ -22,6 +22,14 @@ s$Good = as.logical(predict(ld, s)$class)
 1 - sum(p$Good) / nrow(p)
 1 - sum(s$Good) / nrow(s)
 
+## By instrument
+
+## By instrument
+1 - sum(p$Good[p$Instrument == "HIDS2046"]) / 
+  nrow(p[p$Instrument == "HIDS2046",])
+1 - sum(p$Good[p$Instrument == "HIDS2052"]) / 
+  nrow(p[p$Instrument == "HIDS2052",])
+
 # Offset correction ----
 ## Are averages for the screened data different than zero?
 shapiro.test(pirms$d18O[pirms$Good] - pirms$d18O.irms[pirms$Good])
