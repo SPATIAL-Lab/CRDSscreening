@@ -7,7 +7,7 @@ airms = read.csv("out/airms.csv")
 load("out/ld.rda")
 
 plant = "darkgreen"
-soil = "lightgoldenrod2"
+soil = "lightgoldenrod3"
 good = "deepskyblue3"
 bad = "darkorange"
 
@@ -197,7 +197,7 @@ lines(c(0, 1 / ld$scaling["CH4",]), rep(bds[3], 2), lwd = 8,
 dev.off()
 
 # Figure 3 ----
-png("out/Figure3.png", 9.2, 5, units = "in", res = 600)
+png("out/Figure3.png", 9.2, 4.7, units = "in", res = 600)
 layout(matrix(1:2, nrow = 1))
 cols = c(good, bad)
 par(mar = c(5, 5, 1, 1))
