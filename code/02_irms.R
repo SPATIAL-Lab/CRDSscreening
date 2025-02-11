@@ -32,13 +32,22 @@ sd(s.diff.o)
 p.diff.h = apply(cbind(pirms$d2H.irms, pirms$d2H), 1, diff)
 p.diff.o = apply(cbind(pirms$d18O.irms, pirms$d18O), 1, diff)
 
+# Four outliers look like they evaporated between analyses
+pirms = pirms[p.diff.o > -5, ]
+p.diff.h = p.diff.h[p.diff.o > -0.5]
+p.diff.o = p.diff.o[p.diff.o > -0.5]
+
+# One has anomalously high Dex
+pirms = pirms[pirms$d2H.irms - 8 * pirms$d18O.irms < 20, ]
+p.diff.h = p.diff.h[pirms$d2H.irms - 8 * pirms$d18O.irms < 20]
+p.diff.o = p.diff.o[pirms$d2H.irms - 8 * pirms$d18O.irms < 20]
+
+
 # Plant stats
 shapiro.test(p.diff.h)
 shapiro.test(p.diff.o)
 SignTest(p.diff.h)
 SignTest(p.diff.o)
-t.test(p.diff.h)
-t.test(p.diff.o)
 sd(p.diff.h)
 sd(p.diff.o)
 

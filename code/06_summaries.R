@@ -7,14 +7,35 @@ s = read.csv("out/soils.csv")
 # Species summaries ----
 ## Space
 specSpec = data.frame("Species" = unique(p$Species), "Count" = rep(0),
-                      "LowSS" = rep(0))
+                      "d18O.off.m" = rep(0), "d18O.off.sd" = rep(0),
+                      "d2H.off.m" = rep(0), "d2H.off.sd" = rep(0),
+                      "d18O.off.high" = rep(0), "d2H.off.high" = rep(0))
 
-## How many screened?
+## Offset stats
 for(i in seq_along(specSpec$Species)){
   psub = p[p$Species == specSpec$Species[i], ]
   specSpec$Count[i] = nrow(psub)
-  specSpec$LowSS[i] = sum(!psub$Good)
+  
+  specSpec$d18O.off.m[i] = mean(psub$d18O.off)
+  specSpec$d18O.off.sd[i] = sd(psub$d18O.off)
+  
+  specSpec$d2H.off.m[i] = mean(psub$d2H.off)
+  specSpec$d2H.off.sd[i] = sd(psub$d2H.off)
+  
+  specSpec$d18O.off.high[i] = sum(psub$d18O.off > 1) / nrow(psub)
+  specSpec$d2H.off.high[i] = sum(psub$d2H.off > 8) / nrow(psub)
 }
+
+subSpec = specSpec[order(specSpec$d18O.off.m, decreasing = TRUE),]
+subSpec = head(subSpec, 8)
+
+psub = p[p$Species %in% subSpec$Species, ]
+
+boxplot(d18O.off ~ Species, data = psub)
+
+plot(specSpec$d18O.off.m, specSpec$d2H.off.m)
+
+
 
 ## Fraction
 specSpec$LowFrac = specSpec$LowSS / specSpec$Count
