@@ -16,10 +16,10 @@ for(i in seq_along(specSpec$Species)){
   psub = p[p$Species == specSpec$Species[i], ]
   specSpec$Count[i] = nrow(psub)
   
-  specSpec$d18O.off.m[i] = mean(psub$d18O.off)
+  specSpec$d18O.off.m[i] = median(psub$d18O.off)
   specSpec$d18O.off.sd[i] = sd(psub$d18O.off)
   
-  specSpec$d2H.off.m[i] = mean(psub$d2H.off)
+  specSpec$d2H.off.m[i] = median(psub$d2H.off)
   specSpec$d2H.off.sd[i] = sd(psub$d2H.off)
   
   specSpec$d18O.off.high[i] = sum(psub$d18O.off > 1) / nrow(psub)
@@ -30,15 +30,9 @@ subSpec = specSpec[order(specSpec$d18O.off.m, decreasing = TRUE),]
 subSpec = head(subSpec, 8)
 
 psub = p[p$Species %in% subSpec$Species, ]
+psub$sid = match(psub$Species, subSpec$Species)
 
-boxplot(d18O.off ~ Species, data = psub)
-
-plot(specSpec$d18O.off.m, specSpec$d2H.off.m)
-
-
-
-## Fraction
-specSpec$LowFrac = specSpec$LowSS / specSpec$Count
+boxplot(d18O.off ~ sid, data = psub)
 
 ## Get common names from GBIF, gives warnings
 specSpec$Vernacular = rep("")
@@ -51,7 +45,7 @@ for(i in seq_along(specSpec$Species)){
 }
 
 ## Sort and view
-specSpec = specSpec[rev(order(specSpec$LowFrac)), ]
+specSpec = specSpec[rev(order(specSpec$d18O.off.high)), ]
 View(specSpec)
 
 ## Save
@@ -60,20 +54,27 @@ write.csv(specSpec, "out/screenedBySpecies.csv", row.names = FALSE)
 # Site summaries ----
 ## Space
 siteSpec = data.frame("Site" = unique(p$Site_ID), "Count" = rep(0),
-                      "LowSS" = rep(0))
+                      "d18O.off.m" = rep(0), "d18O.off.sd" = rep(0),
+                      "d2H.off.m" = rep(0), "d2H.off.sd" = rep(0),
+                      "d18O.off.high" = rep(0), "d2H.off.high" = rep(0))
 
 ## How many low SS?
 for(i in seq_along(siteSpec$Site)){
   psub = p[p$Site_ID == siteSpec$Site[i] & !is.na(p$SlopeShift),]
   siteSpec$Count[i] = nrow(psub)
-  siteSpec$LowSS[i] = sum(!psub$Good)
+  
+  siteSpec$d18O.off.m[i] = median(psub$d18O.off)
+  siteSpec$d18O.off.sd[i] = sd(psub$d18O.off)
+  
+  siteSpec$d2H.off.m[i] = median(psub$d2H.off)
+  siteSpec$d2H.off.sd[i] = sd(psub$d2H.off)
+  
+  siteSpec$d18O.off.high[i] = sum(psub$d18O.off > 1) / nrow(psub)
+  siteSpec$d2H.off.high[i] = sum(psub$d2H.off > 8) / nrow(psub)
 }
 
-## Fraction
-siteSpec$LowFrac = siteSpec$LowSS / siteSpec$Count
-
 ## Sort and view
-siteSpec = siteSpec[rev(order(siteSpec$LowFrac)), ]
+siteSpec = siteSpec[rev(order(siteSpec$d18O.off.high)), ]
 View(siteSpec)
 
 ## Save

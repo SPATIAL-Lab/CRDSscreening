@@ -12,12 +12,22 @@ s = s[, !(names(s) %in% names(ssAve))]
 p = merge(p, ssAve, by.x = "Sample_ID", by.y = "ID")
 s = merge(s, ssAve, by.x = "Sample_ID", by.y = "ID")
 
-## P vs S
-p$d18O.off = predict(lmO, p)
-p$d2H.off = predict(lmH, p)
+## Predict
+pO.off = predict(lmO, p, interval = "prediction")
+p$d18O.off = pO.off[, 1]
+p$d18O.off.pw = (pO.off[, 3] - pO.off[, 2]) / 2
 
-s$d18O.off = predict(lmO, s)
-s$d2H.off = predict(lmH, s)
+pH.off = predict(lmH, p, interval = "prediction")
+p$d2H.off = pH.off[, 1]
+p$d2H.off.pw = (pH.off[, 3] - pH.off[, 2]) / 2
+
+sO.off = predict(lmO, s, interval = "prediction")
+s$d18O.off = sO.off[, 1]
+s$d18O.off.pw = (sO.off[, 3] - sO.off[, 2]) / 2
+
+sH.off = predict(lmH, s, interval = "prediction")
+s$d2H.off = sH.off[, 1]
+s$d2H.off.pw = (sH.off[, 3] - sH.off[, 2]) / 2
 
 ## Compare
 plot(density(p$d18O.off))
@@ -55,8 +65,14 @@ p$d2H.oc = p$d2H - p$d2H.off
 s$d2H.oc = s$d2H - s$d2H.off
 
 plot(p$d18O, p$d2H)
+abline(10, 8, lwd = 2)
+arrows(p$d18O.oc - 2 * p$d18O.off.se, p$d2H.oc,
+       p$d18O.oc + 2 * p$d18O.off.se, p$d2H.oc,
+       angle = 90, length = 0.05, code = 3, col = 2)
+arrows(p$d18O.oc, p$d2H.oc - 2 * p$d2H.off.se,
+       p$d18O.oc, p$d2H.oc + 2 * p$d2H.off.se,
+       angle = 90, length = 0.05, code = 3, col = 2)
 points(p$d18O.oc, p$d2H.oc, pch = 21, bg = 2)
-abline(10, 8)
 
 plot(s$d18O, s$d2H)
 points(s$d18O.oc, s$d2H.oc, pch = 21, bg = 2)

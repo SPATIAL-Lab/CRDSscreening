@@ -137,8 +137,33 @@ sd(t10$resH)
 sd(t20$resO)
 sd(t20$resH)
 
+## Apply
+pO.off = predict(lmO, pirms, se.fit = TRUE)
+pirms$d18O.off = pO.off$fit
+pirms$d18O.off.se = pO.off$se.fit
+
+pH.off = predict(lmH, pirms, se.fit = TRUE)
+pirms$d2H.off = pH.off$fit
+pirms$d2H.off.se = pH.off$se.fit
+
+sO.off = predict(lmO, sirms, se.fit = TRUE)
+sirms$d18O.off = sO.off$fit
+sirms$d18O.off.se = sO.off$se.fit
+
+sH.off = predict(lmH, sirms, se.fit = TRUE)
+sirms$d2H.off = sH.off$fit
+sirms$d2H.off.se = sH.off$se.fit
+
+pirms$d18O.oc = pirms$d18O - pirms$d18O.off
+sirms$d18O.oc = sirms$d18O - sirms$d18O.off
+
+pirms$d2H.oc = pirms$d2H - pirms$d2H.off
+sirms$d2H.oc = sirms$d2H - sirms$d2H.off
+
+airms = rbind(pirms, sirms)
+
 ## Save
 write.csv(pirms, "out/pirms.csv", row.names = FALSE)
 write.csv(sirms, "out/sirms.csv", row.names = FALSE)
 write.csv(airms, "out/airms.csv", row.names = FALSE)
-save(lmO, lmH, airms, file = "out/lm.rda")
+save(lmO, lmH, file = "out/lm.rda")
