@@ -42,7 +42,6 @@ pirms = pirms[pirms$d2H.irms - 8 * pirms$d18O.irms < 20, ]
 p.diff.h = p.diff.h[pirms$d2H.irms - 8 * pirms$d18O.irms < 20]
 p.diff.o = p.diff.o[pirms$d2H.irms - 8 * pirms$d18O.irms < 20]
 
-
 # Plant stats
 shapiro.test(p.diff.h)
 shapiro.test(p.diff.o)
@@ -50,6 +49,12 @@ SignTest(p.diff.h)
 SignTest(p.diff.o)
 sd(p.diff.h)
 sd(p.diff.o)
+
+# Number of high offsets
+sum(p.diff.h > 8) / length(p.diff.h)
+sum(p.diff.o > 1) / length(p.diff.o)
+sum(s.diff.h > 8) / length(s.diff.h)
+sum(s.diff.o > 1) / length(s.diff.o)
 
 # Write out these results
 write.csv(pirms, "out/pirms.csv", row.names = FALSE)

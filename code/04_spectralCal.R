@@ -85,6 +85,8 @@ lmH = lm(d2H.off ~ SlopeShift:CH4,  data = airms)
 
 # Residuals ----
 ## d18O
+sd(lmO$residuals)
+
 shapiro.test(lmO$residuals)
 
 plot(density(lmO$residuals))
@@ -97,6 +99,8 @@ wilcox.test(lmO$residuals[airms$Instrument == "HIDS2046"],
        lmO$residuals[airms$Instrument == "HIDS2052"])
 
 ## d2H
+sd(lmH$residuals)
+
 shapiro.test(lmH$residuals)
 
 plot(density(lmH$residuals))
@@ -138,21 +142,21 @@ sd(t20$resO)
 sd(t20$resH)
 
 ## Apply
-pO.off = predict(lmO, pirms, se.fit = TRUE)
-pirms$d18O.off = pO.off$fit
-pirms$d18O.off.se = pO.off$se.fit
+pO.off = predict(lmO, pirms, interval = "prediction")
+pirms$d18O.off = pO.off[, 1]
+pirms$d18O.off.pw = (pO.off[, 3] - pO.off[, 2]) / 2
 
-pH.off = predict(lmH, pirms, se.fit = TRUE)
-pirms$d2H.off = pH.off$fit
-pirms$d2H.off.se = pH.off$se.fit
+pH.off = predict(lmH, pirms, interval = "prediction")
+pirms$d2H.off = pH.off[, 1]
+pirms$d2H.off.pw = (pH.off[, 3] - pH.off[, 2]) / 2
 
-sO.off = predict(lmO, sirms, se.fit = TRUE)
-sirms$d18O.off = sO.off$fit
-sirms$d18O.off.se = sO.off$se.fit
+sO.off = predict(lmO, sirms, interval = "prediction")
+sirms$d18O.off = sO.off[, 1]
+sirms$d18O.off.pw = (sO.off[, 3] - sO.off[, 2]) / 2
 
-sH.off = predict(lmH, sirms, se.fit = TRUE)
-sirms$d2H.off = sH.off$fit
-sirms$d2H.off.se = sH.off$se.fit
+sH.off = predict(lmH, sirms, interval = "prediction")
+sirms$d2H.off = sH.off[, 1]
+sirms$d2H.off.pw = (sH.off[, 3] - sH.off[, 2]) / 2
 
 pirms$d18O.oc = pirms$d18O - pirms$d18O.off
 sirms$d18O.oc = sirms$d18O - sirms$d18O.off

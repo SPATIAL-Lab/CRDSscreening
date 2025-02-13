@@ -64,20 +64,6 @@ s$d18O.oc = s$d18O - s$d18O.off
 p$d2H.oc = p$d2H - p$d2H.off
 s$d2H.oc = s$d2H - s$d2H.off
 
-plot(p$d18O, p$d2H)
-abline(10, 8, lwd = 2)
-arrows(p$d18O.oc - 2 * p$d18O.off.se, p$d2H.oc,
-       p$d18O.oc + 2 * p$d18O.off.se, p$d2H.oc,
-       angle = 90, length = 0.05, code = 3, col = 2)
-arrows(p$d18O.oc, p$d2H.oc - 2 * p$d2H.off.se,
-       p$d18O.oc, p$d2H.oc + 2 * p$d2H.off.se,
-       angle = 90, length = 0.05, code = 3, col = 2)
-points(p$d18O.oc, p$d2H.oc, pch = 21, bg = 2)
-
-plot(s$d18O, s$d2H)
-points(s$d18O.oc, s$d2H.oc, pch = 21, bg = 2)
-abline(10, 8)
-
 ## Save
 write.csv(p, "out/plants.csv", row.names = FALSE)
 write.csv(s, "out/soils.csv", row.names = FALSE)
