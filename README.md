@@ -1,4 +1,5 @@
-Data and code for manuscript on spectral screening and correction of CRDS water isotope data.
+# CRDSscreening
+Data and code for manuscript on spectral screening and correction of CRDS water isotope data
 
 ## data/
 Data assets used in analysis
