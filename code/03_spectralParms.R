@@ -1,6 +1,5 @@
 # File names
-fn = list.files("data/rf/")
-rf = file.path("data", "rf", fn)
+fn = list.files("data/cf/")
 cf = file.path("data", "cf", fn)
 
 # Process metrics- ----
@@ -8,9 +7,9 @@ sshift = data.frame("Vial" = numeric(), "BaseShift" = numeric(),
                     "SlopeShift" = numeric(), "Residuals" = numeric(),
                     "BaseCurve" = numeric(), "CH4" = numeric(),
                     "ID" = character(), "Instrument" = character())
-for(i in seq_along(rf)){
+
+for(i in seq_along(cf)){
   ## Read files
-  ids = read.csv(rf[i])
   d = read.csv(cf[i])
   
   ## Get vial #s from Port
@@ -21,7 +20,8 @@ for(i in seq_along(rf)){
   if(length(unique(d.vials)) > 4){
     spec = data.frame("Vial" = unique(d.vials), "BaseShift" = rep(0), 
                       "SlopeShift" = rep(0), "Residuals" = rep(0),
-                      "BaseCurve" = rep(0), "CH4" = rep(0))
+                      "BaseCurve" = rep(0), "CH4" = rep(0), 
+                      "ID" = rep(""))
     for(j in seq_along(spec$Vial)){
       spec$BaseShift[j] = mean(d$baseline_shift[d.vials == spec$Vial[j]],
                                 na.rm = TRUE)
@@ -33,6 +33,9 @@ for(i in seq_along(rf)){
                                 na.rm = TRUE)
       spec$CH4[j] = mean(d$ch4_ppm[d.vials == spec$Vial[j]],
                                 na.rm = TRUE)
+      spec$ID[j] = paste(d$Identifier.2[match(spec$Vial[j], d.vials)],
+                         d$Identifier.1[match(spec$Vial[j], d.vials)],
+                         sep = "_")
     }
     
     ## Standardize to the vial 4 average
@@ -40,12 +43,8 @@ for(i in seq_along(rf)){
       spec[j, 2:6] = spec[j, 2:6] - spec[spec$Vial == 4, 2:6]
     }
 
-    ## Add sample IDs
-    ids$ID = paste(ids$Identifier.2, ids$Description, sep = "_")
-    spec$ID = ids$ID[match(spec$Vial, ids$Vial)]
-    
     ## Add instrument
-    spec$Instrument = rep(substr(rf[i], nchar(rf[i]) - 11, nchar(rf[i]) - 4))
+    spec$Instrument = rep(substr(cf[i], nchar(cf[i]) - 11, nchar(cf[i]) - 4))
     
     ## Bind
     sshift = rbind(sshift, spec)

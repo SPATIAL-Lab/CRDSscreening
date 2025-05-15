@@ -37,8 +37,15 @@ for(i in seq_along(fdate)){
   cf = append(cf, cfs[length(cfs)])
 }
 
-# Copy to project
+# Merge sample IDs into coordinator files and save to project
 for(i in seq_along(rf)){
-  file.copy(rf[i], file.path("data", "rf", fname[i]))
-  file.copy(cf[i], file.path("data", "cf", fname[i]))
+  run = read.csv(rf[i])
+  cord = read.csv(cf[i])
+  port = as.numeric(substr(cord$Port, regexpr("-", cord$Port) + 1, nchar(cord$Port)))
+  for(j in seq_along(run[, 1])){
+    k = port == run$Vial[j]
+    cord$Identifier.1[k] = run$Description[j]
+    cord$Identifier.2[k] = run$Identifier.2[j]
+  }
+  write.csv(cord, file.path("data", "cf", fname[i]), row.names = FALSE)
 }
