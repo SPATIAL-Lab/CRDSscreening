@@ -23,7 +23,7 @@ plot(sirms$d2H.irms, sirms$d2H, type = "n",
 abline(0, 1, lwd = 2)
 points(sirms$d2H.irms, sirms$d2H, pch = 21, bg = soil, col = "grey90",
        cex = 1.5)
-points(sirms$d2H.irms, sirms$d2H.oc, pch = 21, bg = soil, cex = 1.75, lwd = 2)
+points(sirms$d2H.irms, sirms$d2H.oc, pch = 21, bg = soil, cex = 1.5, lwd = 2)
 
 bds = par("usr")
 text(bds[2] - 0.05 * diff(bds[1:2]),
@@ -44,7 +44,7 @@ plot(pirms$d2H.irms, pirms$d2H.oc, type = "n",
      ylab = expression(delta^2*"H"["CRDS"]*" (VSMOW)"))
 abline(0, 1, lwd = 2)
 points(pirms$d2H.irms, pirms$d2H, pch = 21, bg = plant, col = "grey90")
-points(pirms$d2H.irms, pirms$d2H.oc, pch = 21, bg = plant, cex = 1.75, lwd = 2)
+points(pirms$d2H.irms, pirms$d2H.oc, pch = 21, bg = plant, cex = 1.5, lwd = 2)
 
 bds = par("usr")
 text(bds[2] - 0.05 * diff(bds[1:2]),
@@ -66,7 +66,7 @@ plot(sirms$d18O.irms, sirms$d18O, type = "n", xlim = c(-9.5, -3),
      ylab = expression(delta^18*"O"["CRDS"]*" (VSMOW)"))
 abline(0, 1, lwd = 2)
 points(sirms$d18O.irms, sirms$d18O, pch = 21, bg = soil, col = "grey90")
-points(sirms$d18O.irms, sirms$d18O.oc, pch = 21, bg = soil, cex = 1.75, lwd = 2)
+points(sirms$d18O.irms, sirms$d18O.oc, pch = 21, bg = soil, cex = 1.5, lwd = 2)
 bds = par("usr")
 text(bds[2] - 0.05 * diff(bds[1:2]),
      bds[3] + 0.1 * diff(bds[3:4]),
@@ -86,7 +86,7 @@ plot(pirms$d18O.irms, pirms$d18O, type = "n", ylim = c(-12, 10),
      ylab = expression(delta^18*"O"["CRDS"]*" (VSMOW)"))
 abline(0, 1, lwd = 2)
 points(pirms$d18O.irms, pirms$d18O, pch = 21, bg = plant, col = "grey90")
-points(pirms$d18O.irms, pirms$d18O.oc, pch = 21, bg = plant, cex = 1.75, lwd = 2)
+points(pirms$d18O.irms, pirms$d18O.oc, pch = 21, bg = plant, cex = 1.5, lwd = 2)
 bds = par("usr")
 text(bds[2] - 0.05 * diff(bds[1:2]),
      bds[3] + 0.1 * diff(bds[3:4]),
@@ -99,11 +99,12 @@ text(bds[2] - 0.05 * diff(bds[1:2]),
             "\u2030"), 
      adj = c(1, 0))
 text(bds[1] + 0.05 * diff(bds[1:2]), bds[4] - 0.05 * diff(bds[3:4]), "D")
-legend("topright", legend = c("Raw", "Corrected", "Soil", "Xylem"), 
-       pch = 21, pt.bg = c("grey50", "grey50", soil, plant), 
-       col = c("grey90", "black", "white", "white"), 
-       pt.cex = c(1, 1.75, 1.35, 1.35), 
-       pt.lwd = c(1, 2, 1, 1), bty = "n", ncol = 2)
+
+legend("topright", legend = c("Raw soil", "Corrected soil", "Raw xylem", 
+                              "Corrected xylem"), 
+       pch = 21, pt.bg = c(soil, soil, plant, plant), 
+       col = c("grey90", "black", "grey90", "black"), 
+       pt.cex = c(1, 1.5, 1, 1.5), pt.lwd = c(1, 2, 1, 2), bty = "n")
 
 dev.off()
 
@@ -201,20 +202,28 @@ box()
 dev.off()
 
 # Figure 3 ----
-png("out/Figure3.png", 9.2, 5, units = "in", res = 600)
-layout(matrix(1:2, nrow = 1), widths = c(lcm(5 * 2.54), lcm(4.2 * 2.54)))
+bout = "HARV1"
+s.sub = s[grep(bout, s$Sample_ID), ]
+p.sub = p[grep(bout, p$Sample_ID), ]
+
+png("out/Figure3.png", 8.2, 8.2, units = "in", res = 600)
+layout(matrix(1:4, nrow = 2, byrow = TRUE), 
+       widths = c(lcm(4.5 * 2.54), lcm(3.7 * 2.54)),
+       heights = c(lcm(3.7 * 2.54), lcm(4.5 * 2.54)))
 
 ## Raw
-par(mai = c(1, 1, 0.2, 0.2))
+par(mai = c(0.2, 1, 0.2, 0.2))
 xlim = range(c(p$d18O, s$d18O, p$d18O.oc, s$d18O.oc))
 ylim = range(c(p$d2H, s$d2H, p$d2H.oc, s$d2H.oc))
 
-plot(p$d18O, p$d2H, xlim = xlim, ylim = ylim, pch = 20, cex = 0.5,
-     xlab = expression(delta^{18}*"O (VSMOW)"),
-     ylab = expression(delta^2*"H (VSMOW)"))
+plot(p$d18O, p$d2H, xlim = xlim, ylim = ylim, type = "n",
+     xlab = "", ylab = expression(delta^2*"H (VSMOW)"), axes = FALSE)
+axis(1, labels = FALSE)
+axis(2)
+box()
 abline(10, 8, lwd = 2)
-points(s$d18O, s$d2H, pch = 21, bg = soil)
-points(p$d18O, p$d2H, pch = 21, bg = plant)
+points(s$d18O, s$d2H, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
+points(p$d18O, p$d2H, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "A")
@@ -222,18 +231,49 @@ legend("bottomright", legend = c("Soil", "Xylem"), pch = 21,
        pt.bg = c(soil, plant), bty = "n")
 
 ## Corrected
+par(mai = c(0.2, 0.2, 0.2, 0.2))
+
+plot(p$d18O.oc, p$d2H.oc, xlim = xlim, ylim = ylim, type = "n",
+     xlab = "", ylab = "", axes = FALSE)
+axis(1, labels = FALSE)
+axis(2, labels = FALSE)
+box()
+abline(10, 8, lwd = 2)
+points(s$d18O.oc, s$d2H.oc, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
+points(p$d18O.oc, p$d2H.oc, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
+bds = par("usr")
+text(bds[1] + 0.05 * diff(bds[1:2]),
+     bds[4] - 0.05 * diff(bds[3:4]), "B")
+
+## Example bout
+xlim = range(c(s.sub$d18O, s.sub$d18O.oc, p.sub$d18O, p.sub$d18O.oc))
+ylim = range(c(s.sub$d2H, s.sub$d2H.oc, p.sub$d2H, p.sub$d2H.oc))
+
+par(mai = c(1, 1, 0.2, 0.2))
+
+plot(p$d18O, p$d2H, xlim = xlim, ylim = ylim, type = "n",
+     xlab = expression(delta^{18}*"O (VSMOW)"),
+     ylab = expression(delta^2*"H (VSMOW)"))
+abline(10, 8, lwd = 2)
+points(s.sub$d18O, s.sub$d2H, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
+points(p.sub$d18O, p.sub$d2H, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
+bds = par("usr")
+text(bds[1] + 0.05 * diff(bds[1:2]),
+     bds[4] - 0.05 * diff(bds[3:4]), "C")
+
+## Corrected
 par(mai = c(1, 0.2, 0.2, 0.2))
 
-plot(p$d18O.oc, p$d2H.oc, xlim = xlim, ylim = ylim, pch = 20, cex = 0.5,
+plot(p$d18O.oc, p$d2H.oc, xlim = xlim, ylim = ylim, type = "n",
      xlab = expression(delta^{18}*"O (VSMOW)"), axes = FALSE)
 axis(1)
 axis(2, labels = FALSE)
 box()
 abline(10, 8, lwd = 2)
-points(s$d18O.oc, s$d2H.oc, pch = 21, bg = soil)
-points(p$d18O.oc, p$d2H.oc, pch = 21, bg = plant)
+points(s.sub$d18O.oc, s.sub$d2H.oc, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
+points(p.sub$d18O.oc, p.sub$d2H.oc, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
-     bds[4] - 0.05 * diff(bds[3:4]), "B")
+     bds[4] - 0.05 * diff(bds[3:4]), "D")
 
 dev.off()
