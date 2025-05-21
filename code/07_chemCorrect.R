@@ -5,10 +5,6 @@
 library(openxlsx)
 library(tidyxl)
 
-# Read data
-p = read.csv("out/plants.csv")
-s = read.csv("out/soils.csv")
-
 # ChemCorrect files
 fl = list.files("data/cc/", full.names = TRUE, pattern = ".xlsx")
 
@@ -60,7 +56,11 @@ for(i in seq_along(ID)){
   Flag[i] = max(cc$Flag[cc$ID == ID[i]])
 }
 
-# Merge with plant and soil data
+# Merge with plant and soil data - full dataset
+## Read data
+p = read.csv("out/plants.csv")
+s = read.csv("out/soils.csv")
+
 ## Make space
 cc = data.frame(ID, Flag)
 
@@ -80,7 +80,7 @@ rbind(table(p$Flag), table(p$Flag) / nrow(p))
 rbind(table(s$Flag), table(s$Flag) / nrow(s))
 rbind(table(c(p$Flag, s$Flag)), table(c(p$Flag, s$Flag)) / (nrow(p) + nrow(s)))
 
-## 
+## Relationship between offsets and flags
 exceed = function(x, y){
   c(sum(x > y), sum(x > y) / length(x))
 }
@@ -98,3 +98,4 @@ cc.all = rbind(cc.all, data.frame("d18O.off" = s$d18O.off,
 
 tapply(cc.all$d18O.off, cc.all$Flag, exceed, 1)
 tapply(cc.all$d2H.off, cc.all$Flag, exceed, 8)
+
