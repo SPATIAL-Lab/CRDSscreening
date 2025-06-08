@@ -129,7 +129,12 @@ points(airms$SlopeShift * airms$CH4, airms$d2H - airms$d2H.irms, pch = 21,
        bg = "grey50", cex = 2, lwd = 2)
 
 bds = par("usr")
-text(bds[2] - 0.05 * diff(bds[1:2]), bds[4] - 0.05 * diff(bds[3:4]), "A")
+text(bds[2] - 0.03 * diff(bds[1:2]), bds[4] - 0.03 * diff(bds[3:4]), "A", 
+     adj = c(1, 1))
+r2 = round(summary(lmH)$adj.r.squared, 2)
+text(bds[2] - 0.03 * diff(bds[1:2]), bds[3] + 0.03 * diff(bds[3:4]), 
+     bquote(R^{2} ~ "=" ~ .(r2)),
+     adj = c(1, 0))
 
 ## d18O - Residuals - CH4
 plot(airms$CH4, airms$Residuals, xlab = expression(Delta*"CH"[4]),
@@ -150,7 +155,8 @@ for(i in seq_along(offset)){
 points(airms$CH4, airms$Residuals, pch = 21, cex = 2, lwd = 2, bg = cols[ci])
 
 bds = par("usr")
-text(bds[2] - 0.05 * diff(bds[1:2]), bds[4] - 0.05 * diff(bds[3:4]), "B")
+text(bds[2] - 0.03 * diff(bds[1:2]), bds[4] - 0.03 * diff(bds[3:4]), "B",
+     adj = c(1, 1))
 
 ## Legend
 xmin = 0.05
@@ -195,7 +201,16 @@ for(i in seq_along(offset)){
 points(airms$CH4, airms$BaseShift, pch = 21, cex = 2, lwd = 2, bg = cols[ci])
 
 bds = par("usr")
-text(bds[2] - 0.05 * diff(bds[1:2]), bds[4] - 0.05 * diff(bds[3:4]), "C")
+text(bds[2] - 0.03 * diff(bds[1:2]), bds[4] - 0.03 * diff(bds[3:4]), "C",
+     adj = c(1, 1))
+
+rect(bds[1], bds[3], bds[1] + 0.25 * diff(bds[1:2]),
+     bds[3] + 0.1 * diff(bds[3:4]), col = rgb(1, 1, 1, 0.75),
+     border = NA)
+r2 = round(summary(lmO)$adj.r.squared, 2)
+text(bds[1] + 0.03 * diff(bds[1:2]), bds[3] + 0.03 * diff(bds[3:4]), 
+     bquote(R^{2} ~ "=" ~ .(r2)),
+     adj = c(0, 0))
 
 box()
 
@@ -223,12 +238,13 @@ axis(2)
 box()
 abline(10, 8, lwd = 2)
 points(s$d18O, s$d2H, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
-points(p$d18O, p$d2H, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
+points(p$d18O, p$d2H, pch = 20, col = plant, cex = 0.75)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "A")
-legend("bottomright", legend = c("Soil", "Xylem"), pch = 21, 
-       pt.bg = c(soil, plant), bty = "n")
+legend("bottomright", legend = c("Soil", "Xylem"), pch = c(21, 20), 
+       pt.bg = c(soil, plant), pt.cex = c(1.25, 0.75),
+       bty = "n")
 
 ## Corrected
 par(mai = c(0.2, 0.2, 0.2, 0.2))
@@ -240,7 +256,7 @@ axis(2, labels = FALSE)
 box()
 abline(10, 8, lwd = 2)
 points(s$d18O.oc, s$d2H.oc, pch = 21, bg = soil, cex = 1.25, lwd = 1.5)
-points(p$d18O.oc, p$d2H.oc, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
+points(p$d18O.oc, p$d2H.oc, pch = 20, col = plant, cex = 0.75)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "B")
@@ -260,6 +276,8 @@ points(p.sub$d18O, p.sub$d2H, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "C")
+legend("bottomright", legend = c("Soil", "Xylem"), pch = 21, 
+       pt.bg = c(soil, plant), bty = "n")
 
 ## Corrected
 par(mai = c(1, 0.2, 0.2, 0.2))
@@ -275,5 +293,44 @@ points(p.sub$d18O.oc, p.sub$d2H.oc, pch = 21, bg = plant, cex = 1.25, lwd = 1.5)
 bds = par("usr")
 text(bds[1] + 0.05 * diff(bds[1:2]),
      bds[4] - 0.05 * diff(bds[3:4]), "D")
+
+dev.off()
+
+# Figure S1 ----
+
+png("out/FigureS1.png", 8.2, 4.2, units = "in", res = 600)
+layout(matrix(1:2, nrow = 1))
+par(mar = c(5, 5, 1, 1))
+
+psirms = rbind(pirms, sirms)
+ps = rbind(p[, names(p) != "Species"], s)
+
+ylim = range(log(abs(ps$d18O.off)))
+boxplot(log(abs(d18O - d18O.irms)) ~ Flag, data = psirms, boxwex = 0.35, 
+        xlim = c(0.7, 3.7), ylim = ylim, axes = FALSE,
+        xlab = "ChemCorrect flag", ylab = expression(delta^{18}*"O bias"))
+boxplot(log(abs(d18O.off)) ~ Flag, data = ps, boxwex = 0.35, at = seq(1.4, 3.4), 
+        col = "grey30", add = TRUE, axes = FALSE)
+axis(1, seq(1.2, 3.2), c("Green", "Yellow", "Red"))
+axis(2, log(c(0.01, 0.1, 1, 10)), c(0.01, 0.1, 1, 10))
+box()
+
+bds = par("usr")
+text(bds[1] + 0.05 * diff(bds[1:2]),
+          bds[4] - 0.05 * diff(bds[3:4]), "A")
+
+ylim = range(log(abs(ps$d2H.off)))
+boxplot(log(abs(d2H - d2H.irms)) ~ Flag, data = psirms, boxwex = 0.35, 
+        xlim = c(0.7, 3.7), ylim = ylim, axes = FALSE,
+        xlab = "ChemCorrect flag", ylab = expression(delta^{2}*"H bias"))
+boxplot(log(abs(d2H.off)) ~ Flag, data = ps, boxwex = 0.35, at = seq(1.4, 3.4), 
+        col = "grey30", add = TRUE, axes = FALSE)
+axis(1, seq(1.2, 3.2), c("Green", "Yellow", "Red"))
+axis(2, log(c(0.01, 0.1, 1, 10)), c(0.01, 0.1, 1, 10))
+box()
+
+bds = par("usr")
+text(bds[1] + 0.05 * diff(bds[1:2]),
+          bds[4] - 0.05 * diff(bds[3:4]), "B")
 
 dev.off()
